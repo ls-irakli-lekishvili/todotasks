@@ -1,6 +1,5 @@
 package com.cst.todotasks.extensions
 
-import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 

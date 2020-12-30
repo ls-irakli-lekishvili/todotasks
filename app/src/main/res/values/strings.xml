@@ -6,4 +6,9 @@
     <string name="menu_filter">Filter</string>
     <string name="menu_clear">Clear completed</string>
     <string name="menu_delete_task">Delete task</string>
+    <string name="all_tasks">All Tasks</string>
+    <string name="no_tasks">No Tasks</string>
+    <string name="no_tasks_text">You have no tasks!</string>
+    <string name="title">Title</string>
+    <string name="task">Enter you task here.</string>
 </resources>

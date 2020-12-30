@@ -9,6 +9,5 @@ data class Todo(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "body") val body: String,
-) {
-
-}
+    @ColumnInfo(name = "isChecked") val isChecked: Boolean
+)

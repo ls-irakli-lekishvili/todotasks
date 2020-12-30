@@ -3,6 +3,7 @@ package com.cst.todotasks.ui
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.room.Room
 import com.cst.todotasks.R
 import com.cst.todotasks.dao.TodoDao
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         initDB(this)
         replaceFragment(R.id.fragment_container, TaskListFragment.createInstance())
+
+
     }
 
     companion object GetDao {
