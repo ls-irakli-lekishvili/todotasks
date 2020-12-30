@@ -8,9 +8,6 @@ interface TodoDao {
     @Query("SELECT * FROM todo")
     fun getAll(): List<Todo>
 
-    @Query("SELECT * FROM todo WHERE id = (:id)")
-    fun getSpecificTodo(id: Int): Todo
-
     @Insert
     fun insertTodo(vararg todo: Todo)
 
@@ -19,5 +16,8 @@ interface TodoDao {
 
     @Update
     fun updateTodo(vararg todo: Todo)
+
+    @Query("UPDATE todo SET isChecked = (:isChecked) WHERE id = (:id)")
+    fun updateChecked(id: Int, isChecked: Boolean)
 
 }

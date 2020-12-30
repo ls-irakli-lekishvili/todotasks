@@ -1,6 +1,7 @@
 package com.cst.todotasks.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
@@ -18,6 +19,9 @@ import kotlinx.coroutines.withContext
 
 
 class TaskListFragment : Fragment() {
+
+    private lateinit var tasks: List<Todo>
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,7 +41,23 @@ class TaskListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.menu_clear -> {
-                // TODO თქვენი კოდი
+                tasks.forEach {
+                    if(it.isChecked) {
+                        GlobalScope.launch {
+                            withContext(Dispatchers.IO) {
+                                MainActivity.dao.deleteTodo(it)
+                            }
+                        }
+                    }
+                }
+
+                tasks = tasks.filter {
+                    !it.isChecked
+                }
+
+                (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks)
+                (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
+
                 true
             }
             R.id.menu_filter -> {
@@ -55,22 +75,45 @@ class TaskListFragment : Fragment() {
         val view = activity?.findViewById<View>(R.id.menu_filter) ?: return
         PopupMenu(requireContext(), view).run {
             menuInflater.inflate(R.menu.filter_tasks, menu)
-
             setOnMenuItemClickListener {
                 when (it.itemId) {
+
+
                     R.id.active -> {
-                        // TODO თქვენი კოდი
+                        getData()
+                        val activeList = tasks.filter { todo ->
+                            !todo.isChecked
+                        }
+                        (recyclerView.adapter as TodoListAdapter).setNewLIst(activeList)
+                        (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
                     }
+
                     R.id.completed -> {
-                        // TODO თქვენი კოდი
+                        getData()
+                        val completedList = tasks.filter { todo ->
+                            todo.isChecked
+                        }
+
+                        (recyclerView.adapter as TodoListAdapter).setNewLIst(completedList)
+                        (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
                     }
                     else -> {
-                        // TODO თქვენი კოდი
+                        getData()
+                        (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks)
+                        (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
                     }
                 }
                 true
             }
             show()
+        }
+    }
+
+    private fun getData() {
+        GlobalScope.launch {
+        withContext(Dispatchers.IO) {
+            tasks = MainActivity.dao.getAll()
+        }
         }
     }
 
@@ -84,7 +127,7 @@ class TaskListFragment : Fragment() {
 
             GlobalScope.launch {
                 withContext(Dispatchers.IO) {
-                    val tasks = MainActivity.dao.getAll()
+                    tasks = MainActivity.dao.getAll()
                     withContext(Dispatchers.Main) {
                         if (tasks.isEmpty()) {
                             emptyTasksHandler()
@@ -117,7 +160,7 @@ class TaskListFragment : Fragment() {
         activity?.let {
             val allTasks = it.findViewById<TextView>(R.id.all_tasks_title)
             val emptyHolder = it.findViewById<LinearLayout>(R.id.empty_todo_list_container)
-            val recyclerView = it.findViewById<RecyclerView>(R.id.todo_recycler_view)
+            recyclerView = it.findViewById(R.id.todo_recycler_view)
 
             allTasks.visibility = TextView.VISIBLE
             emptyHolder.visibility = LinearLayout.GONE
