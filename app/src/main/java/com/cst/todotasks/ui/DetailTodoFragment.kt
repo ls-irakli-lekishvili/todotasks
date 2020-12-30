@@ -1,9 +1,7 @@
 package com.cst.todotasks.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
@@ -18,6 +16,7 @@ import kotlinx.coroutines.withContext
 
 class DetailTodoFragment: Fragment() {
 
+    private lateinit var todo: Todo
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,9 +29,45 @@ class DetailTodoFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val todo = arguments?.getParcelable<Todo>("todo")
-        setContent(todo as Todo)
+
+        setUpNavBar()
+
+        todo = arguments?.getParcelable("todo")!!
+        setContent(todo)
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.recycle_bin, menu)
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                activity?.supportFragmentManager?.popBackStack()
+                return true
+            }
+
+            R.id.trash -> {
+                GlobalScope.launch {
+                    withContext(Dispatchers.IO) {
+                        MainActivity.dao.deleteTodo(todo)
+                        activity?.supportFragmentManager?.popBackStack()
+                    }
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun setUpNavBar() {
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.title = "Task Details"
+
+    }
+
+
 
     private fun setContent(todo: Todo) {
         view?.let {

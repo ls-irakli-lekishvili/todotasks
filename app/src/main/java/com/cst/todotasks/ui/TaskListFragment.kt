@@ -1,7 +1,6 @@
 package com.cst.todotasks.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.LinearLayout
@@ -29,20 +28,21 @@ class TaskListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_task_list, container, false)
+        setUpNavBar()
         setHasOptionsMenu(true)
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getTasks()
+        setUp()
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.menu_clear -> {
                 tasks.forEach {
-                    if(it.isChecked) {
+                    if (it.isChecked) {
                         GlobalScope.launch {
                             withContext(Dispatchers.IO) {
                                 MainActivity.dao.deleteTodo(it)
@@ -71,14 +71,19 @@ class TaskListFragment : Fragment() {
         inflater.inflate(R.menu.tasks_fragment_menu, menu)
     }
 
+    private fun setUpNavBar() {
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(false)
+        actionBar?.title = "TODO"
+    }
+
+
     private fun showFilteringPopUpMenu() {
         val view = activity?.findViewById<View>(R.id.menu_filter) ?: return
         PopupMenu(requireContext(), view).run {
             menuInflater.inflate(R.menu.filter_tasks, menu)
             setOnMenuItemClickListener {
                 when (it.itemId) {
-
-
                     R.id.active -> {
                         getData()
                         val activeList = tasks.filter { todo ->
@@ -111,13 +116,13 @@ class TaskListFragment : Fragment() {
 
     private fun getData() {
         GlobalScope.launch {
-        withContext(Dispatchers.IO) {
-            tasks = MainActivity.dao.getAll()
-        }
+            withContext(Dispatchers.IO) {
+                tasks = MainActivity.dao.getAll()
+            }
         }
     }
 
-    private fun getTasks() {
+    private fun setUp() {
         context?.let {
 
             val circleOptions = activity?.findViewById<Button>(R.id.circle_option_add)
@@ -166,7 +171,8 @@ class TaskListFragment : Fragment() {
             emptyHolder.visibility = LinearLayout.GONE
             recyclerView.visibility = RecyclerView.VISIBLE
 
-            recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            recyclerView.layoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             recyclerView.adapter = TodoListAdapter(tasks)
         }
 

@@ -2,11 +2,11 @@ package com.cst.todotasks.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.cst.todotasks.R
@@ -29,6 +29,8 @@ class AddTodoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpNavBar()
+
         activity?.let {
             val circleOptions = it.findViewById<Button>(R.id.circle_option_done)
             circleOptions.setOnClickListener {
@@ -36,6 +38,24 @@ class AddTodoFragment : Fragment() {
             }
         }
     }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                activity?.supportFragmentManager?.popBackStack()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun setUpNavBar() {
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.title = "New Task"
+    }
+
 
     private fun doneClickHandler() {
         val addTitle = view?.findViewById<EditText>(R.id.adding_title)
@@ -51,15 +71,18 @@ class AddTodoFragment : Fragment() {
             else -> {
                 GlobalScope.launch {
                     withContext(Dispatchers.IO) {
-                        MainActivity.dao.insertTodo(Todo(
-                            title = addTitle.text.toString(),
-                            body = addTask.text.toString(),
-                            isChecked = false
-                        ))
+                        MainActivity.dao.insertTodo(
+                            Todo(
+                                title = addTitle.text.toString(),
+                                body = addTask.text.toString(),
+                                isChecked = false
+                            )
+                        )
                     }
                 }
                 activity?.supportFragmentManager?.popBackStack()
             }
         }
     }
+
 }

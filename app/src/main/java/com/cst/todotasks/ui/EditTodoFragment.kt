@@ -2,6 +2,7 @@ package com.cst.todotasks.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -30,8 +31,27 @@ class EditTodoFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setUpNavBar()
+
         val todo = arguments?.getParcelable<Todo>("todo")
         setContent(todo as Todo)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                activity?.supportFragmentManager?.popBackStack()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun setUpNavBar() {
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.title = "Edit Task"
     }
 
     private fun setContent(todo: Todo) {
