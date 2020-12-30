@@ -79,6 +79,7 @@ class EditTodoFragment: Fragment() {
                                 MainActivity.dao.updateTodo(todo)
                             }
                         }
+                        Toast.makeText(context, "Task Edited", Toast.LENGTH_SHORT).show()
                         activity?.supportFragmentManager?.popBackStack()
                     }
                 }

@@ -51,6 +51,7 @@ class DetailTodoFragment: Fragment() {
             R.id.trash -> {
                 GlobalScope.launch {
                     withContext(Dispatchers.IO) {
+                        Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
                         MainActivity.dao.deleteTodo(todo)
                         activity?.supportFragmentManager?.popBackStack()
                     }

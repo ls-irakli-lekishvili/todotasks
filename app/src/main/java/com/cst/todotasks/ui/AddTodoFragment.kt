@@ -80,6 +80,7 @@ class AddTodoFragment : Fragment() {
                         )
                     }
                 }
+                Toast.makeText(context, "Task added", Toast.LENGTH_SHORT).show()
                 activity?.supportFragmentManager?.popBackStack()
             }
         }

@@ -38,9 +38,10 @@ class TaskListFragment : Fragment() {
         setUp()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) =
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_clear -> {
+                if (tasks.isEmpty()) return false
                 tasks.forEach {
                     if (it.isChecked) {
                         GlobalScope.launch {
@@ -57,15 +58,17 @@ class TaskListFragment : Fragment() {
 
                 (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks)
                 (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
-
-                true
+                getData()
+                if (tasks.isEmpty()) emptyTasksHandler()
+                return true
             }
             R.id.menu_filter -> {
                 showFilteringPopUpMenu()
-                true
             }
-            else -> false
+            else -> return false
         }
+        return false
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.tasks_fragment_menu, menu)
@@ -86,26 +89,29 @@ class TaskListFragment : Fragment() {
                 when (it.itemId) {
                     R.id.active -> {
                         getData()
-                        val activeList = tasks.filter { todo ->
-                            !todo.isChecked
+                        if (tasks.isNotEmpty()) {
+                            (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks.filter { todo ->
+                                !todo.isChecked
+                            })
+                            (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
                         }
-                        (recyclerView.adapter as TodoListAdapter).setNewLIst(activeList)
-                        (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
                     }
 
                     R.id.completed -> {
                         getData()
-                        val completedList = tasks.filter { todo ->
-                            todo.isChecked
+                        if (tasks.isNotEmpty()) {
+                            (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks.filter { todo ->
+                                todo.isChecked
+                            })
+                            (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
                         }
-
-                        (recyclerView.adapter as TodoListAdapter).setNewLIst(completedList)
-                        (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
                     }
                     else -> {
                         getData()
-                        (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks)
-                        (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
+                        if (tasks.isNotEmpty()) {
+                            (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks)
+                            (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
+                        }
                     }
                 }
                 true
@@ -148,7 +154,12 @@ class TaskListFragment : Fragment() {
     private fun emptyTasksHandler() {
         activity?.let {
             val allTasks = it.findViewById<TextView>(R.id.all_tasks_title)
+            val emptyHolder = it.findViewById<LinearLayout>(R.id.empty_todo_list_container)
+
             allTasks.visibility = TextView.GONE
+            emptyHolder.visibility = LinearLayout.VISIBLE
+
+
         }
 
     }
