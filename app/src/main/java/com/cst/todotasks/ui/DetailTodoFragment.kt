@@ -23,17 +23,15 @@ class DetailTodoFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_detail_todo, container, false)
+        todo = arguments?.getParcelable("todo")!!
+        setContent(todo)
         setHasOptionsMenu(true)
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setUpNavBar()
-
-        todo = arguments?.getParcelable("todo")!!
-        setContent(todo)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -51,11 +49,12 @@ class DetailTodoFragment: Fragment() {
             R.id.trash -> {
                 GlobalScope.launch {
                     withContext(Dispatchers.IO) {
-                        Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
                         MainActivity.dao.deleteTodo(todo)
-                        activity?.supportFragmentManager?.popBackStack()
                     }
                 }
+                Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
+                activity?.supportFragmentManager?.popBackStack()
+
             }
         }
         return super.onOptionsItemSelected(item)
