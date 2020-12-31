@@ -38,40 +38,45 @@ class TaskListFragment : Fragment() {
         setUp()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.menu_clear -> {
-                if (tasks.isEmpty()) return false
-                tasks.forEach {
-                    if (it.isChecked) {
-                        GlobalScope.launch {
-                            withContext(Dispatchers.IO) {
-                                MainActivity.dao.deleteTodo(it)
-                            }
-                        }
-                    }
+                if (tasks.isEmpty()) false
+                else {
+                    deleteTasks()
+                    true
                 }
-
-                tasks = tasks.filter {
-                    !it.isChecked
-                }
-
-                (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks)
-                (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
-                getData()
-                if (tasks.isEmpty()) emptyTasksHandler()
-                return true
             }
             R.id.menu_filter -> {
                 showFilteringPopUpMenu()
+                true
             }
-            else -> return false
+            else -> false
         }
-        return false
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.tasks_fragment_menu, menu)
+    }
+
+    private fun deleteTasks() {
+        tasks.forEach {
+            if (it.isChecked) {
+                GlobalScope.launch {
+                    withContext(Dispatchers.IO) {
+                        MainActivity.dao.deleteTodo(it)
+                    }
+                }
+            }
+        }
+
+        tasks = tasks.filter {
+            !it.isChecked
+        }
+
+        (recyclerView.adapter as TodoListAdapter).setNewLIst(tasks)
+        (recyclerView.adapter as TodoListAdapter).notifyDataSetChanged()
+
+        if (tasks.isEmpty()) emptyTasksHandler()
     }
 
     private fun setUpNavBar() {
@@ -120,6 +125,7 @@ class TaskListFragment : Fragment() {
         }
     }
 
+    @Synchronized
     private fun getData() {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {

@@ -23,14 +23,14 @@ class DetailTodoFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_detail_todo, container, false)
-        todo = arguments?.getParcelable("todo")!!
-        setContent(todo)
         setHasOptionsMenu(true)
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        todo = arguments?.getParcelable("todo")!!
+        setContent(todo)
         setUpNavBar()
     }
 
